@@ -1,0 +1,21 @@
+{
+  "name": "growth-sdk",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "lint": "oxlint packages/*/src"
+  },
+  "devDependencies": {
+    "oxlint": "^1.71.0",
+    "typescript": "~6.0.2",
+    "vite": "^6.3.5",
+    "vite-plugin-dts": "^5.0.3",
+    "vitest": "^3.2.1"
+  }
+}
