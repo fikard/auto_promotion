@@ -1,7 +1,13 @@
-/** 触发条件类型 */
+/** 原子条件（保持向后兼容） */
 export interface TriggerCondition {
   type: 'usage_count' | 'days_inactive' | 'feature_complete' | 'payment' | 'milestone' | 'custom';
   params: Record<string, unknown>;
+}
+
+/** 组合条件 */
+export interface CompositeCondition {
+  operator: 'and' | 'or';
+  conditions: (TriggerCondition | CompositeCondition)[];
 }
 
 /** 触发动作类型 */
@@ -17,11 +23,11 @@ export interface CooldownConfig {
   dailyLimit: number;
 }
 
-/** 触发器定义 */
+/** 触发器定义 — condition 字段支持组合条件 */
 export interface Trigger {
   id: string;
   name: string;
-  condition: TriggerCondition;
+  condition: TriggerCondition | CompositeCondition;
   actions: TriggerAction[];
   cooldown: CooldownConfig;
   enabled: boolean;

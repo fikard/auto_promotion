@@ -1,7 +1,7 @@
 import type { PlatformType } from '../adapter';
 
 /** 推广渠道 */
-export type PromotionChannel = 'product_hunt' | 'reddit' | 'hacker_news' | 'twitter' | 'indie_hackers' | 'seo';
+export type PromotionChannel = 'product_hunt' | 'reddit' | 'hacker_news' | 'twitter' | 'indie_hackers' | 'seo' | 'discord' | 'linkedin';
 
 /** 模板变量定义 */
 export interface TemplateVariable {

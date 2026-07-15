@@ -1,5 +1,5 @@
 import type { PlatformAdapter, AnalyticsEvent } from '../adapter';
-import type { Trigger, TriggerHistory, UserEvent, TriggerAction } from './types';
+import type { Trigger, TriggerHistory, UserEvent, TriggerAction, TriggerCondition, CompositeCondition } from './types';
 
 const STORAGE_KEY = 'growth_sdk_trigger_state';
 
@@ -86,7 +86,19 @@ export class TriggerEngine {
   }
 
   private matchesCondition(trigger: Trigger, event: UserEvent): boolean {
-    const { condition } = trigger;
+    return this.evaluateCondition(trigger.condition, event);
+  }
+
+  private evaluateCondition(condition: TriggerCondition | CompositeCondition, event: UserEvent): boolean {
+    // 组合条件：递归评估子条件
+    if ('operator' in condition) {
+      if (condition.operator === 'and') {
+        return condition.conditions.every(c => this.evaluateCondition(c, event));
+      } else {
+        return condition.conditions.some(c => this.evaluateCondition(c, event));
+      }
+    }
+    // 原子条件逻辑
     switch (condition.type) {
       case 'usage_count': {
         const targetCount = condition.params.sessionCount as number;
@@ -169,7 +181,7 @@ export class TriggerEngine {
     }
   }
 
-  private async saveState(): Promise<void> {
+  async saveState(): Promise<void> {
     await this.adapter.storage.set(STORAGE_KEY, this.state);
   }
 }

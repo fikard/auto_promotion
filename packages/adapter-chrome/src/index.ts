@@ -11,6 +11,7 @@ declare const chrome: {
 
 export interface ChromeAdapterOptions {
   storeUrl: string;
+  uiRenderer?: import('./ui').UIRenderer;
 }
 
 export class ChromeAdapter implements PlatformAdapter {
@@ -21,7 +22,7 @@ export class ChromeAdapter implements PlatformAdapter {
 
   constructor(options: ChromeAdapterOptions) {
     this.storage = new ChromeStorage();
-    this.ui = new ChromeUI();
+    this.ui = new ChromeUI({ renderer: options.uiRenderer });
     this.links = new ChromeLinks(options.storeUrl);
     this.device = {
       getPlatform: () => 'chrome' as const,
@@ -34,3 +35,4 @@ export class ChromeAdapter implements PlatformAdapter {
 export { ChromeStorage } from './storage';
 export { ChromeUI } from './ui';
 export { ChromeLinks } from './links';
+export type { UIRenderer, ChromeUIOptions } from './ui';

@@ -108,4 +108,13 @@ export interface GrowthSDKConfig {
     apiKey: string;
   };
   triggers?: Record<string, TriggerConfig>;
+  featureFlags?: {
+    remoteConfigUrl?: string;
+    context?: import('./feature-flags/types').FlagContext;
+  };
+  privacy?: {
+    defaultConsent?: 'granted' | 'denied' | 'unknown';
+    anonymousMode?: boolean;
+    sensitiveFields?: string[];
+  };
 }

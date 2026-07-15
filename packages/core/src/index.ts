@@ -20,6 +20,7 @@ export type {
 export type {
   Trigger,
   TriggerCondition,
+  CompositeCondition,
   TriggerAction,
   CooldownConfig,
   TriggerHistory,
@@ -37,6 +38,10 @@ export type {
   PromotionChannel,
 } from './templates/types';
 
+// 实验统计
+export type { VariantStats, ExperimentResult } from './templates/statistics';
+export { ExperimentStats } from './templates/statistics';
+
 // 推广类型
 export type {
   PromotionStrategy,
@@ -49,11 +54,27 @@ export type {
   AudienceProfile,
 } from './promotion/types';
 
+// 归因追踪
+export type { UTMParams, AttributionRecord } from './promotion/attribution';
+export { AttributionTracker } from './promotion/attribution';
+
+// 推广反馈
+export type { PromotionFeedback, ChannelPerformance } from './promotion/feedback';
+export { PromotionFeedbackTracker } from './promotion/feedback';
+
 // 分析类型
 export type { AnalyticsEvent as AnalyticsEventType } from './analytics/types';
 
+// 隐私合规
+export { ConsentManager } from './analytics/consent';
+export type { ConsentState, ConsentManagerOptions } from './analytics/consent';
+
 // 邮件类型
 export type { EmailTemplate, EmailConfig } from './email/types';
+
+// Feature Flag
+export type { FeatureFlag, FlagType, FlagRule, FlagContext, FlagResult } from './feature-flags/types';
+export { FlagEngine } from './feature-flags/flag-engine';
 
 // 触发器工厂函数
 export { createSecondSessionRating, createUsageCountRating } from './triggers/built-in/usage-count';

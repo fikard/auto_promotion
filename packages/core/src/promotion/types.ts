@@ -1,6 +1,6 @@
 import type { PlatformType } from '../adapter';
 
-export type PromotionChannel = 'product_hunt' | 'reddit' | 'hacker_news' | 'twitter' | 'indie_hackers' | 'seo';
+export type PromotionChannel = 'product_hunt' | 'reddit' | 'hacker_news' | 'twitter' | 'indie_hackers' | 'seo' | 'discord' | 'linkedin';
 
 export interface TimingStrategy {
   trigger: 'version_release' | 'milestone' | 'manual';
@@ -45,6 +45,7 @@ export interface PromotContent {
   cta?: string;
   tags: string[];
   recommendedTime?: Date;
+  url?: string;
 }
 
 export interface ProductInfo {

@@ -1,7 +1,30 @@
 import type { RatingPromptConfig, RatingAction, NotificationConfig, ShareConfig } from '@growth-sdk/core';
 
+/** 自定义 UI 渲染器 */
+export interface UIRenderer {
+  renderRatingPrompt?(config: RatingPromptConfig, container: HTMLElement): Promise<RatingAction>;
+  renderNotification?(config: NotificationConfig, container: HTMLElement): Promise<void>;
+  renderShareDialog?(config: ShareConfig, container: HTMLElement): Promise<void>;
+}
+
+export interface ChromeUIOptions {
+  renderer?: UIRenderer;
+}
+
 export class ChromeUI {
+  private renderer?: UIRenderer;
+
+  constructor(options?: ChromeUIOptions) {
+    this.renderer = options?.renderer;
+  }
+
   async showRatingPrompt(config: RatingPromptConfig): Promise<RatingAction> {
+    // 如果有自定义渲染器，优先使用
+    if (this.renderer?.renderRatingPrompt) {
+      const container = document.body;
+      return this.renderer.renderRatingPrompt(config, container);
+    }
+
     return new Promise((resolve) => {
       const overlay = this.createOverlay();
       const dialog = this.createDialog();
@@ -37,6 +60,12 @@ export class ChromeUI {
   }
 
   async showNotification(config: NotificationConfig): Promise<void> {
+    // 如果有自定义渲染器，优先使用
+    if (this.renderer?.renderNotification) {
+      const container = document.body;
+      return this.renderer.renderNotification(config, container);
+    }
+
     const toast = document.createElement('div');
     toast.style.cssText = `
       position:fixed;top:16px;right:16px;z-index:2147483647;
@@ -59,6 +88,12 @@ export class ChromeUI {
   }
 
   async showShareDialog(config: ShareConfig): Promise<void> {
+    // 如果有自定义渲染器，优先使用
+    if (this.renderer?.renderShareDialog) {
+      const container = document.body;
+      return this.renderer.renderShareDialog(config, container);
+    }
+
     const shareUrl = new URL('https://twitter.com/intent/tweet');
     shareUrl.searchParams.set('text', `${config.title}\n${config.text}`);
     shareUrl.searchParams.set('url', config.url);
