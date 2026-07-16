@@ -6,6 +6,11 @@ import { Tracker } from './analytics/tracker';
 import { ConsentManager } from './analytics/consent';
 import { EmailTrigger } from './email/email-trigger';
 import { FlagEngine } from './feature-flags/flag-engine';
+import { PublishEngine } from './publish/publish-engine';
+import { DiscordProvider } from './publish/providers/discord';
+import { RedditProvider } from './publish/providers/reddit';
+import { TwitterProvider } from './publish/providers/twitter';
+import { LinkedInProvider } from './publish/providers/linkedin';
 import { createSecondSessionRating, createUsageCountRating } from './triggers/built-in/usage-count';
 import { createInactiveReactivate } from './triggers/built-in/inactive';
 import type { Trigger } from './triggers/types';
@@ -14,6 +19,7 @@ import type { RenderOptions, RenderedContent, GrowthTemplate, TemplateVariant } 
 import type { PromotionChannel, PromotionTrigger, PromotionEvent, PromotionResult, PromotContent, PromotionStrategy, ProductInfo } from './promotion/types';
 import type { PromotionFeedback, ChannelPerformance } from './promotion/feedback';
 import type { FeatureFlag, FlagContext } from './feature-flags/types';
+import type { PublishChannelConfig, PublishOptions, PublishResult } from './publish/types';
 
 export class GrowthSDK {
   private config: GrowthSDKConfig;
@@ -24,6 +30,7 @@ export class GrowthSDK {
   private _analytics: Tracker;
   private _email: EmailTrigger;
   private _flags: FlagEngine;
+  private _publish: PublishEngine;
   private _consent: ConsentManager;
   private initialized = false;
 
@@ -31,21 +38,17 @@ export class GrowthSDK {
     this.config = config;
     this.adapter = config.adapter;
 
-    const dispatchEvent = (event: AnalyticsEvent) => this._analytics.track(event.name, event.properties);
-
     this._consent = new ConsentManager(config.privacy ? {
       defaultConsent: config.privacy.defaultConsent,
       anonymousMode: config.privacy.anonymousMode,
       sensitiveFields: config.privacy.sensitiveFields,
     } : undefined);
 
+    const dispatchEvent = (event: AnalyticsEvent) => this._analytics.track(event.name, event.properties);
+
     this._analytics = new Tracker(config.analytics?.provider, {
       adapter: config.adapter,
-      consent: config.privacy ? {
-        defaultConsent: config.privacy.defaultConsent,
-        anonymousMode: config.privacy.anonymousMode,
-        sensitiveFields: config.privacy.sensitiveFields,
-      } : undefined,
+      consentManager: this._consent,
     });
     this._triggers = new TriggerEngine(this.adapter, dispatchEvent);
     this._templates = new TemplateEngine(this.adapter, config.product);
@@ -71,6 +74,27 @@ export class GrowthSDK {
     } : undefined, dispatchEvent);
 
     this._flags = new FlagEngine(this.adapter, config.featureFlags?.context);
+
+    this._publish = new PublishEngine(this.adapter, config.publish?.channels, dispatchEvent);
+
+    // 注册并自动认证内置提供商
+    const providers = [
+      new DiscordProvider(),
+      new RedditProvider(),
+      new TwitterProvider(),
+      new LinkedInProvider(),
+    ];
+
+    for (const provider of providers) {
+      this._publish.registerProvider(provider);
+      const channelKey = provider.channel === 'product_hunt' ? 'productHunt' : provider.channel;
+      const channelConfig = (config.publish?.channels as any)?.[channelKey];
+      if (channelConfig) {
+        provider.authenticate(channelConfig).catch(() => {
+          // 认证失败不影响 SDK 初始化
+        });
+      }
+    }
   }
 
   async init(): Promise<void> {
@@ -144,6 +168,25 @@ export class GrowthSDK {
       deny: () => this._consent.deny(),
       isGranted: () => this._consent.isGranted(),
       setAnonymousMode: (enabled: boolean) => this._consent.setAnonymousMode(enabled),
+    };
+  }
+
+  get publish() {
+    return {
+      /** 配置平台帐号 */
+      configure: (config: PublishChannelConfig) => this._publish.configure(config),
+      /** 发布到单个渠道 */
+      publish: (channel: PromotionChannel, content: PromotContent, options?: PublishOptions) =>
+        this._publish.publish(channel, content, options),
+      /** 批量发布到多个渠道 */
+      publishAll: (channels: PromotionChannel[], content: PromotContent, options?: PublishOptions) =>
+        this._publish.publishAll(channels, content, options),
+      /** 获取可用渠道列表 */
+      getAvailableChannels: () => this._publish.getAvailableChannels(),
+      /** 检查渠道是否可用 */
+      isAvailable: (channel: PromotionChannel) => this._publish.isAvailable(channel),
+      /** 注册自定义提供商 */
+      registerProvider: (provider: import('./publish/types').PublishProvider) => this._publish.registerProvider(provider),
     };
   }
 

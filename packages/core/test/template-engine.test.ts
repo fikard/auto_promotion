@@ -21,11 +21,11 @@ const TEST_TEMPLATE: GrowthTemplate = {
   type: 'trigger',
   name: 'Test Template',
   locales: {
-    en: { title: 'Hello {name}!', body: 'Welcome to {productName}. {greeting}', cta: 'Try now' },
-    zh: { title: '你好 {name}！', body: '欢迎来到 {productName}。{greeting}', cta: '立即试用' },
+    en: { title: 'Hello {userName}!', body: 'Welcome to {productName}. {greeting}', cta: 'Try now' },
+    zh: { title: '你好 {userName}！', body: '欢迎来到 {productName}。{greeting}', cta: '立即试用' },
   },
   variables: [
-    { name: 'name', type: 'string', required: true, source: 'custom' },
+    { name: 'userName', type: 'string', required: true, source: 'custom' },
     { name: 'productName', type: 'string', required: true, source: 'product' },
     { name: 'greeting', type: 'string', required: false, source: 'custom', defaultValue: 'Enjoy!' },
   ],
@@ -50,7 +50,7 @@ describe('TemplateEngine', () => {
   it('应能渲染模板并替换变量', () => {
     engine.register(TEST_TEMPLATE);
     const result = engine.render('test_template', {
-      variables: { name: 'Alice', productName: 'PageLens' },
+      variables: { userName: 'Alice', productName: 'PageLens' },
     });
     expect(result.title).toBe('Hello Alice!');
     expect(result.body).toContain('PageLens');
@@ -61,7 +61,7 @@ describe('TemplateEngine', () => {
     engine.register(TEST_TEMPLATE);
     const result = engine.render('test_template', {
       locale: 'zh',
-      variables: { name: '小明', productName: 'PageLens' },
+      variables: { userName: '小明', productName: 'PageLens' },
     });
     expect(result.title).toBe('你好 小明！');
     expect(result.locale).toBe('zh');
@@ -71,7 +71,7 @@ describe('TemplateEngine', () => {
     engine.register(TEST_TEMPLATE);
     const result = engine.render('test_template', {
       locale: 'ja',
-      variables: { name: 'Tanaka', productName: 'PageLens' },
+      variables: { userName: 'Tanaka', productName: 'PageLens' },
     });
     expect(result.locale).toBe('en');
     expect(result.title).toBe('Hello Tanaka!');
@@ -79,8 +79,8 @@ describe('TemplateEngine', () => {
 
   it('缺少必填变量时应抛出错误', () => {
     engine.register(TEST_TEMPLATE);
-    expect(() => engine.render('test_template', { variables: { name: 'Alice' } }))
-      .toThrow(/productName/);
+    expect(() => engine.render('test_template', { variables: {} }))
+      .toThrow(/userName/);
   });
 
   it('未注册的模板应抛出错误', () => {

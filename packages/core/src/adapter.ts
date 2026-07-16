@@ -117,4 +117,7 @@ export interface GrowthSDKConfig {
     anonymousMode?: boolean;
     sensitiveFields?: string[];
   };
+  publish?: {
+    channels?: import('./publish/types').PublishChannelConfig;
+  };
 }

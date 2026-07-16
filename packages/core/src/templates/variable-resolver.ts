@@ -21,7 +21,11 @@ export class VariableResolver {
   validate(customVars: Record<string, unknown>, variables: TemplateVariable[]): void {
     const missing = variables
       .filter(v => v.required)
-      .filter(v => customVars[v.name] === undefined);
+      .filter(v => customVars[v.name] === undefined
+        && this.productVars[v.name] === undefined
+        && this.userVars[v.name] === undefined
+        && v.defaultValue === undefined,
+      );
     if (missing.length > 0) {
       throw new Error(`Missing required variables: ${missing.map(v => v.name).join(', ')}`);
     }

@@ -217,7 +217,7 @@ describe('模板 + 推广 + 分析联合', () => {
     });
 
     it('未注册的渠道应抛出错误', () => {
-      expect(() => sdk.promotion.generate('indie_hackers' as any)).toThrow();
+      expect(() => sdk.promotion.generate('nonexistent_channel' as any)).toThrow();
     });
   });
 

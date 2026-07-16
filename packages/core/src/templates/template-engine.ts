@@ -13,10 +13,14 @@ export class TemplateEngine {
     this.productConfig = productConfig;
     this.resolver = new VariableResolver({
       productName: productConfig.name,
+      name: productConfig.name,
       productTagline: productConfig.tagline,
+      tagline: productConfig.tagline,
       productVersion: productConfig.version,
+      version: productConfig.version,
       storeUrl: productConfig.storeUrl,
       supportUrl: productConfig.supportUrl ?? '',
+      locale: productConfig.locale,
     });
     this.abTest = new ABTestAllocator(adapter);
   }

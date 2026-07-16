@@ -13,6 +13,7 @@ export interface TrackerOptions {
   flushInterval?: number;
   maxQueueSize?: number;
   consent?: ConsentManagerOptions;
+  consentManager?: ConsentManager;
 }
 
 export class Tracker {
@@ -47,7 +48,13 @@ export class Tracker {
     this.adapter = options?.adapter ?? null;
     this.flushInterval = options?.flushInterval ?? 30_000;
     this.maxQueueSize = options?.maxQueueSize ?? 100;
-    this.consent = new ConsentManager(options?.consent);
+
+    // 支持共享 ConsentManager 实例（由 GrowthSDK 传入）或独立创建
+    if (options?.consentManager) {
+      this.consent = options.consentManager;
+    } else {
+      this.consent = new ConsentManager(options?.consent);
+    }
 
     // 启动定期回放
     this.startFlushTimer();

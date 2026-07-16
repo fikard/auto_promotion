@@ -7,6 +7,8 @@ import { HackerNewsGenerator } from './channels/hacker-news';
 import { TwitterGenerator } from './channels/twitter';
 import { DiscordGenerator } from './channels/discord';
 import { LinkedInGenerator } from './channels/linkedin';
+import { IndieHackersGenerator } from './channels/indie-hackers';
+import { SeoGenerator } from './channels/seo';
 import { AttributionTracker } from './attribution';
 import { PromotionFeedbackTracker } from './feedback';
 import type { PromotionFeedback, ChannelPerformance } from './feedback';
@@ -47,6 +49,8 @@ export class StrategyEngine {
     this.registerGenerator(new TwitterGenerator());
     this.registerGenerator(new DiscordGenerator());
     this.registerGenerator(new LinkedInGenerator());
+    this.registerGenerator(new IndieHackersGenerator());
+    this.registerGenerator(new SeoGenerator());
   }
 
   registerGenerator(generator: ChannelGenerator): void {

@@ -79,3 +79,11 @@ export { FlagEngine } from './feature-flags/flag-engine';
 // 触发器工厂函数
 export { createSecondSessionRating, createUsageCountRating } from './triggers/built-in/usage-count';
 export { createInactiveReactivate } from './triggers/built-in/inactive';
+
+// 发布模块
+export type { PublishProvider, PublishOptions, PublishResult, PublishChannelConfig } from './publish/types';
+export { PublishEngine } from './publish/publish-engine';
+export { DiscordProvider } from './publish/providers/discord';
+export { RedditProvider } from './publish/providers/reddit';
+export { TwitterProvider } from './publish/providers/twitter';
+export { LinkedInProvider } from './publish/providers/linkedin';
